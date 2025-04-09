@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Adivinhe o  Número</title>
+</head>
+<body>
+    <div class="content">
+        <h1>Descubra o número </h1>
+        <p id="tentativas">Tentativas restantes: 10</p>
+        <p id="record">Recorde: Nenhum</p>
+        <input type="number" placeholder="Digite um número" id="bet">
+        <button onclick="verifyNumber()">Enviar</button>
+        <button onclick="atualizar()"> Reiniciar</button>
+        <p id="feedback"></p>
+        
+    </div>
+</body>
+
+<script>
+    var numeroSecreto = 0;
+    var tentativas = 0;
+    var limiteTentativas = 10;
+    var melhorPontuação = localStorage.getItem('melhorPontuação') || Infinity;
+
+    function atualizar() {
+        numeroSecreto = parseInt(Math.random() * 100);
+        tentativas = 0;
+        document.getElementById('bet').value = '';
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('tentativas').innerText = "Tentativas restantes: " + limiteTentativas;
+        updateRecordDisplay();
+        console.log('Número para encontrar: ' + numeroSecreto);
+    }
+
+    function verifyNumber() {
+        var element = document.getElementById('bet');
+        var bet = Number(element.value);
+
+        if (bet > 100 || bet < 0 || isNaN(bet)) {
+            alert('Insira um número válido');
+            return;
+        }
+
+        tentativas++;
+        document.getElementById('tentativas').innerText = "Tentativas restantes: " + (limiteTentativas - tentativas);
+
+        if (bet > numeroSecreto) {
+            alert(' O número é MENOR!');
+        } else if (bet < numeroSecreto) {
+            alert(' O número é MAIOR!');
+        } else {
+            alert(' Parabéns! Você acertou em ' + tentativas + ' tentativas!', 'green');
+
+            if (tentativas < melhorPontuação) {
+                melhorPontuação = tentativas;
+                localStorage.setItem('melhorPontuação', melhorPontuação);
+                alert('🥇 Novo recorde: ' + melhorPontuação + ' tentativas!');
+            }
+            atualizar();
+            return;
+        }
+
+        if (tentativas >= limiteTentativas) {
+            updateFeedback(' Você perdeu! O número era ' + numeroSecreto);
+            atualizar();
+        }
+    }
+
+    function updateFeedback(message, color) {
+        var feedback = document.getElementById('feedback');
+        feedback.innerText = message;
+        feedback.style.color = color;
+    }
+
+    function updateRecordDisplay() {
+        document.getElementById('record').innerText = '🏆 Recorde: ' + (melhorPontuação === Infinity ? 'Nenhum' : melhorPontuação + ' tentativas');
+    }
+
+    atualizar();
+</script>
+</html>
